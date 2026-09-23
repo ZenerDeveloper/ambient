@@ -9,44 +9,30 @@ import javax.swing.tree.DefaultMutableTreeNode
  * @author akainth
  */
 @Suppress("unused")
-class Package(source: Element) {
-    /**
-     * The package's name, according to the Snarf site
-     */
-    val name: String = source.getAttribute("name")
-    /**
-     * The category that the package belongs to
-     */
-    val category: String = source.getAttribute("category")
-    /**
-     * The user that published the package
-     */
-    val publisher: String = source.getAttribute("publisher")
-    /**
-     * The package version, unused according to the Ambient site
-     */
-    val version: String = source.getAttribute("version")
-    /**
-     * The package's type. Currently, only Java is supported, although support for C++ is on the roadmap
-     */
-    val projectType: String = source.getAttribute("project_type")
+class Package(
+    val name: String,
+    val category: String,
+    val publisher: String = "",
+    val version: String = "",
+    val projectType: String = "Java",
+    val description: String = "",
+    val entry: String
+) {
+        constructor(source: Element) : this(
+            name = source.getAttribute("name"),
+            category = source.getAttribute("category"),
+            publisher = source.getAttribute("publisher"),
+            version = source.getAttribute("version"),
+            projectType = source.getAttribute("project_type"),
+            description = source.getElementsByTagName("description")
+                .item(0)?.textContent ?: "",
+            entry = (source.getElementsByTagName("entry")
+                .item(0) as Element).getAttribute("url")
+        )
 
-    private val descriptionElement = source.getElementsByTagName("description").item(0)
-    /**
-     * A textual, human readable description of the assignment
-     */
-    val description: String = descriptionElement.textContent
+        val treeNode
+            get() = DefaultMutableTreeNode(this)
 
-    private val entryElement = source.getElementsByTagName("entry").item(0) as Element
-    /**
-     * The URL of the ZIP file containing the package source
-     */
-    val entry: String = entryElement.getAttribute("url")
-
-    val treeNode
-        get() = DefaultMutableTreeNode(this)
-
-    override fun toString(): String {
-        return name
+        override fun toString(): String = name
     }
 }
